@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', function () {
         e.preventDefault();
         addBook();
     });
-
+// test
     function addBook() {
         const title = document.getElementById('title').value;
         const author = document.getElementById('author').value;
