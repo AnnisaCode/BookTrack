@@ -4,6 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data:">
     <title>BookTrack - Reading Collection</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
@@ -20,9 +22,9 @@
         </div>
         <p class="tagline">Organize and track your reading collection</p>
         <form id="bookForm">
-            <input type="text" id="title" placeholder="Book Title" required>
-            <input type="text" id="author" placeholder="Author" required>
-            <input type="number" id="pages" placeholder="Number of Pages" required min="1">
+            <input type="text" id="title" placeholder="Book Title" required maxlength="100">
+            <input type="text" id="author" placeholder="Author" required maxlength="100">
+            <input type="number" id="pages" placeholder="Number of Pages" required min="1" max="10000">
             <select id="category" required>
                 <option value="" disabled selected>Select Category</option>
                 <option value="Novel">Novel</option>
@@ -39,6 +41,10 @@
             <button id="unreadBooks" class="filter-btn">Unread</button>
         </div>
         <div id="bookList"></div>
+
+        <div class="settings-section">
+            <button id="resetData" class="reset-btn"><i class="fas fa-exclamation-triangle"></i> Reset All Data</button>
+        </div>
     </div>
     <script src="script.js"></script>
 </body>

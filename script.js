@@ -4,8 +4,102 @@ document.addEventListener('DOMContentLoaded', function () {
     const allBooksBtn = document.getElementById('allBooks');
     const readBooksBtn = document.getElementById('readBooks');
     const unreadBooksBtn = document.getElementById('unreadBooks');
+    const resetDataBtn = document.getElementById('resetData');
 
-    let books = JSON.parse(localStorage.getItem('books')) || [];
+    // Simple encryption and decryption functions
+    function encrypt(data) {
+        try {
+            // Create simple key for encryption (not for real security, just obfuscation)
+            const key = "BookTrack_Secret_Key";
+            // Convert to JSON string and encode
+            const jsonString = JSON.stringify(data);
+            // Use btoa for simple encoding and add a prefix
+            return 'ENCRYPTED:' + btoa(jsonString + key);
+        } catch (e) {
+            console.error("Encryption error:", e);
+            return JSON.stringify(data); // Fallback to plain JSON
+        }
+    }
+
+    function decrypt(encryptedData) {
+        try {
+            // Check if the data is encrypted
+            if (!encryptedData || !encryptedData.startsWith('ENCRYPTED:')) {
+                // Return empty array for non-encrypted or invalid data
+                return [];
+            }
+            // Remove prefix and decode
+            const encodedData = encryptedData.replace('ENCRYPTED:', '');
+            const key = "BookTrack_Secret_Key";
+            const decodedString = atob(encodedData);
+            // Remove the key from the decoded string
+            const jsonString = decodedString.substring(0, decodedString.length - key.length);
+            // Parse JSON
+            return JSON.parse(jsonString);
+        } catch (e) {
+            console.error("Decryption error:", e);
+            return []; // Return empty array on error
+        }
+    }
+
+    // Load books from local storage with decryption
+    let books = [];
+    try {
+        const storedData = localStorage.getItem('books');
+        books = storedData ? decrypt(storedData) : [];
+
+        // Validate loaded data
+        if (!Array.isArray(books)) {
+            console.warn("Invalid data format in localStorage. Resetting.");
+            books = [];
+        } else {
+            // Validate each book object
+            books = books.filter(book => {
+                return (
+                    book &&
+                    typeof book === 'object' &&
+                    typeof book.title === 'string' &&
+                    typeof book.author === 'string' &&
+                    !isNaN(book.pages) &&
+                    typeof book.category === 'string'
+                );
+            });
+        }
+    } catch (e) {
+        console.error("Error loading books:", e);
+        books = [];
+    }
+
+    // Sanitize function to prevent XSS attacks
+    function sanitizeInput(input) {
+        const div = document.createElement('div');
+        div.textContent = input;
+        return div.innerHTML;
+    }
+
+    // Validate input function
+    function validateInput(title, author, pages) {
+        // Check if title and author contain only valid characters
+        const nameRegex = /^[a-zA-Z0-9\s.,\-':()&]+$/;
+
+        if (!nameRegex.test(title)) {
+            showNotification('Invalid characters in title!', 'delete');
+            return false;
+        }
+
+        if (!nameRegex.test(author)) {
+            showNotification('Invalid characters in author!', 'delete');
+            return false;
+        }
+
+        // Check if pages is a positive number
+        if (isNaN(pages) || parseInt(pages) <= 0 || parseInt(pages) > 10000) {
+            showNotification('Pages must be a positive number less than 10,000!', 'delete');
+            return false;
+        }
+
+        return true;
+    }
 
     // Load books from local storage
     function loadBooks() {
@@ -23,47 +117,111 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Save books to local storage
+    // Save books to local storage with encryption
     function saveBooks() {
-        localStorage.setItem('books', JSON.stringify(books));
+        try {
+            localStorage.setItem('books', encrypt(books));
+        } catch (e) {
+            console.error("Error saving books:", e);
+            showNotification('Error saving data!', 'delete');
+        }
     }
 
+    // Reset all data
+    function resetAllData() {
+        try {
+            if (confirm('Are you sure you want to delete ALL books? This cannot be undone.')) {
+                localStorage.removeItem('books');
+                books = [];
+                loadBooks();
+                showNotification('All data has been reset!', 'delete');
+            }
+        } catch (e) {
+            console.error("Error resetting data:", e);
+            showNotification('Error resetting data!', 'delete');
+        }
+    }
+
+    // Add error handling to all event listeners
     bookForm.addEventListener('submit', function (e) {
-        e.preventDefault();
-        addBook();
+        try {
+            e.preventDefault();
+            addBook();
+        } catch (err) {
+            console.error("Error in form submission:", err);
+            showNotification('An error occurred!', 'delete');
+        }
+    });
+
+    // Reset data button event listener
+    resetDataBtn.addEventListener('click', function () {
+        resetAllData();
     });
 
     function addBook() {
-        const title = document.getElementById('title').value;
-        const author = document.getElementById('author').value;
-        const pages = document.getElementById('pages').value;
-        const category = document.getElementById('category').value;
+        try {
+            const titleInput = document.getElementById('title').value.trim();
+            const authorInput = document.getElementById('author').value.trim();
+            const pagesInput = document.getElementById('pages').value.trim();
+            const category = document.getElementById('category').value;
 
-        // Create a new book object
-        const newBook = {
-            title,
-            author,
-            pages,
-            category,
-            read: false,
-            rating: 0,
-            dateAdded: new Date().toISOString()
-        };
+            // Validate inputs
+            if (!validateInput(titleInput, authorInput, pagesInput)) {
+                return;
+            }
 
-        // Add to books array
-        books.push(newBook);
+            // Validate category is from allowed list
+            const validCategories = ['Novel', 'Education', 'Biography', 'Fiction', 'Non-Fiction'];
+            if (!validCategories.includes(category)) {
+                showNotification('Invalid category selected!', 'delete');
+                return;
+            }
 
-        // Save to local storage
-        saveBooks();
+            // Sanitize inputs
+            const title = sanitizeInput(titleInput);
+            const author = sanitizeInput(authorInput);
+            const pages = parseInt(pagesInput);
 
-        // Create book element
-        createBookElement(newBook, books.length - 1);
+            // Create a new book object
+            const newBook = {
+                title,
+                author,
+                pages,
+                category,
+                read: false,
+                rating: 0,
+                dateAdded: new Date().toISOString()
+            };
 
-        // Show success notification
-        showNotification('Book added successfully!', 'success');
+            // Prevent duplicate entries
+            const isDuplicate = books.some(book =>
+                book.title.toLowerCase() === title.toLowerCase() &&
+                book.author.toLowerCase() === author.toLowerCase()
+            );
 
-        // Reset the form
-        bookForm.reset();
+            if (isDuplicate) {
+                showNotification('This book already exists in your collection!', 'delete');
+                return;
+            }
+
+            // Add to books array
+            books.push(newBook);
+
+            // Save to local storage
+            saveBooks();
+
+            // Create book element
+            createBookElement(newBook, books.length - 1);
+
+            // Show success notification
+            showNotification('Book added successfully!', 'success');
+
+            // Reset the form
+            bookForm.reset();
+        } catch (err) {
+            console.error("Error adding book:", err);
+            showNotification('Error adding book!', 'delete');
+        }
     }
 
     function createBookElement(book, index) {
@@ -80,13 +238,22 @@ document.addEventListener('DOMContentLoaded', function () {
         bookDetails.classList.add('book-details');
 
         const bookTitle = document.createElement('h3');
+        // Use textContent instead of innerHTML for secure rendering
         bookTitle.textContent = book.title;
 
         const bookAuthor = document.createElement('p');
-        bookAuthor.innerHTML = `<i class="fas fa-user-edit"></i> ${book.author}`;
+        // Create elements safely without using innerHTML
+        const authorIcon = document.createElement('i');
+        authorIcon.className = 'fas fa-user-edit';
+        bookAuthor.appendChild(authorIcon);
+        bookAuthor.appendChild(document.createTextNode(' ' + book.author));
 
         const bookPages = document.createElement('p');
-        bookPages.innerHTML = `<i class="fas fa-file-alt"></i> ${book.pages} pages`;
+        // Create elements safely without using innerHTML
+        const pagesIcon = document.createElement('i');
+        pagesIcon.className = 'fas fa-file-alt';
+        bookPages.appendChild(pagesIcon);
+        bookPages.appendChild(document.createTextNode(' ' + book.pages + ' pages'));
 
         const ratingStars = document.createElement('div');
         ratingStars.classList.add('rating');
@@ -117,16 +284,32 @@ document.addEventListener('DOMContentLoaded', function () {
         bookActions.classList.add('book-actions');
 
         const readButton = document.createElement('button');
-        readButton.innerHTML = book.read ? '<i class="fas fa-book"></i> Mark as Unread' : '<i class="fas fa-book-reader"></i> Mark as Read';
+        // Create button content safely
+        const readIcon = document.createElement('i');
+        readIcon.className = book.read ? 'fas fa-book' : 'fas fa-book-reader';
+        readButton.appendChild(readIcon);
+        readButton.appendChild(document.createTextNode(' ' + (book.read ? 'Mark as Unread' : 'Mark as Read')));
+
         readButton.addEventListener('click', function () {
             books[index].read = !books[index].read;
             saveBooks();
             bookItem.classList.toggle('read');
-            readButton.innerHTML = books[index].read ? '<i class="fas fa-book"></i> Mark as Unread' : '<i class="fas fa-book-reader"></i> Mark as Read';
+
+            // Update button content safely
+            readButton.innerHTML = '';
+            const newIcon = document.createElement('i');
+            newIcon.className = books[index].read ? 'fas fa-book' : 'fas fa-book-reader';
+            readButton.appendChild(newIcon);
+            readButton.appendChild(document.createTextNode(' ' + (books[index].read ? 'Mark as Unread' : 'Mark as Read')));
         });
 
         const deleteButton = document.createElement('button');
-        deleteButton.innerHTML = '<i class="fas fa-trash"></i> Delete';
+        // Create button content safely
+        const trashIcon = document.createElement('i');
+        trashIcon.className = 'fas fa-trash';
+        deleteButton.appendChild(trashIcon);
+        deleteButton.appendChild(document.createTextNode(' Delete'));
+
         deleteButton.classList.add('delete-btn');
         deleteButton.addEventListener('click', function () {
             // Confirm delete
