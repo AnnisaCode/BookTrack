@@ -2,88 +2,282 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
-    font-family: 'Arial', sans-serif;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    font-family: 'Poppins', sans-serif;
     margin: 0;
+    padding: 20px;
 }
-/* test */
+
 .library-app {
     text-align: center;
-    background-color: rgba(255, 255, 255, 0.9);
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    max-width: 400px;
+    background-color: rgba(255, 255, 255, 0.95);
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    max-width: 500px;
     width: 100%;
+    position: relative;
+}
+
+.app-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 5px;
+}
+
+.app-header i {
+    font-size: 32px;
+    color: #764ba2;
+    margin-right: 10px;
+}
+
+h1 {
+    color: #333;
+    margin: 0;
+    font-weight: 600;
+}
+
+.tagline {
+    color: #666;
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 14px;
 }
 
 form {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
+    margin-bottom: 20px;
 }
 
-input, button {
-    padding: 10px;
+input,
+select,
+button {
+    padding: 12px;
     border: 1px solid #ddd;
-    border-radius: 5px;
+    border-radius: 8px;
+    font-family: 'Poppins', sans-serif;
+    transition: all 0.3s ease;
+}
+
+input:focus,
+select:focus {
+    border-color: #764ba2;
+    box-shadow: 0 0 0 2px rgba(118, 75, 162, 0.2);
+    outline: none;
 }
 
 button {
-    background-color: #007BFF;
+    background-color: #764ba2;
     color: white;
     cursor: pointer;
+    font-weight: 500;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 
 button:hover {
-    background-color: #0056b3;
+    background-color: #5e3d82;
+    transform: translateY(-2px);
+}
+
+.filter-container {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.filter-btn {
+    background-color: #f1f1f1;
+    color: #555;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 13px;
+}
+
+.filter-btn.active {
+    background-color: #764ba2;
+    color: white;
 }
 
 #bookList {
     margin-top: 20px;
     text-align: left;
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 5px;
 }
 
 .book-item {
     background-color: #f9f9f9;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    margin-bottom: 10px;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 15px;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    border-left: 4px solid #ddd;
+}
+
+.book-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.book-item.read {
+    border-left: 4px solid #4CAF50;
+    background-color: #f5fff5;
 }
 
 .book-details {
-    flex: 1; 
-    margin-right: 10px; 
+    flex: 1;
+    margin-right: 15px;
     word-wrap: break-word;
+}
+
+.book-details h3 {
+    margin: 0 0 8px 0;
+    color: #333;
+    font-size: 18px;
+}
+
+.book-details p {
+    margin: 5px 0;
+    color: #666;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+}
+
+.book-details p i {
+    margin-right: 8px;
+    color: #764ba2;
+}
+
+.category-badge {
+    display: inline-block;
+    background-color: #e6e6fa;
+    color: #5e3d82;
+    padding: 3px 10px;
+    border-radius: 15px;
+    font-size: 12px;
+    margin-bottom: 8px;
+}
+
+.rating {
+    display: flex;
+    margin-top: 8px;
+}
+
+.rating i {
+    color: #ffd700;
+    margin-right: 3px;
+    cursor: pointer;
 }
 
 .book-actions {
     display: flex;
     flex-direction: column;
-    gap: 10px; 
+    gap: 10px;
 }
 
-.book-item button {
-    flex-shrink: 0;
-    white-space: nowrap;
+.book-actions button {
+    padding: 8px 12px;
+    font-size: 13px;
+    border-radius: 6px;
+    width: 100%;
+}
+
+.delete-btn {
+    background-color: #ff6b6b;
+}
+
+.delete-btn:hover {
+    background-color: #ff5252;
+}
+
+.empty-message {
+    text-align: center;
+    padding: 20px;
+    color: #666;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    margin-top: 10px;
+}
+
+.empty-message i {
+    color: #764ba2;
+    margin-right: 8px;
+}
+
+.notification {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #333;
+    color: white;
+    padding: 12px 25px;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    opacity: 1;
+    transition: opacity 0.5s ease;
+}
+
+.notification.success {
+    background-color: #4CAF50;
+}
+
+.notification.delete {
+    background-color: #ff5252;
+}
+
+/* Scrollbar styling */
+#bookList::-webkit-scrollbar {
+    width: 8px;
+}
+
+#bookList::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+#bookList::-webkit-scrollbar-thumb {
+    background: #764ba2;
+    border-radius: 10px;
 }
 
 @media (max-width: 600px) {
+    body {
+        padding: 10px;
+    }
+
     .library-app {
-        padding: 15px;
+        padding: 20px 15px;
+        border-radius: 12px;
     }
 
     .book-item {
-        flex-direction: row;
-        align-items: flex-start;
+        flex-direction: column;
     }
 
     .book-actions {
-        flex-wrap: nowrap; 
+        flex-direction: row;
+        margin-top: 15px;
+        width: 100%;
+    }
+
+    .book-details {
+        margin-right: 0;
+        margin-bottom: 10px;
     }
 }

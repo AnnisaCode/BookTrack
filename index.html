@@ -4,20 +4,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Collection Marker App</title>
+    <title>BookTrack - Reading Collection</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 <!-- test -->
 
 <body>
     <div class="library-app">
-        <h1>Collection Marker App</h1>
+        <div class="app-header">
+            <i class="fas fa-book-open"></i>
+            <h1>BookTrack</h1>
+        </div>
+        <p class="tagline">Organize and track your reading collection</p>
         <form id="bookForm">
             <input type="text" id="title" placeholder="Book Title" required>
             <input type="text" id="author" placeholder="Author" required>
-            <input type="number" id="pages" placeholder="Number of Pages" required>
-            <button type="submit">Add Book</button>
+            <input type="number" id="pages" placeholder="Number of Pages" required min="1">
+            <select id="category" required>
+                <option value="" disabled selected>Select Category</option>
+                <option value="Novel">Novel</option>
+                <option value="Education">Education</option>
+                <option value="Biography">Biography</option>
+                <option value="Fiction">Fiction</option>
+                <option value="Non-Fiction">Non-Fiction</option>
+            </select>
+            <button type="submit"><i class="fas fa-plus"></i> Add Book</button>
         </form>
+        <div class="filter-container">
+            <button id="allBooks" class="filter-btn active">All</button>
+            <button id="readBooks" class="filter-btn">Read</button>
+            <button id="unreadBooks" class="filter-btn">Unread</button>
+        </div>
         <div id="bookList"></div>
     </div>
     <script src="script.js"></script>
