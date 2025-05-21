@@ -273,6 +273,19 @@ button:hover {
     background-color: #d32f2f;
 }
 
+/* Footer styles */
+.app-footer {
+    margin-top: 30px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+}
+
+.app-footer p {
+    color: #888;
+    font-size: 12px;
+    margin: 0;
+}
+
 /* Secure badge */
 .secure-badge {
     position: absolute;
