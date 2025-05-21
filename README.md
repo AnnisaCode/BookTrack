@@ -2,8 +2,6 @@
 
 BookTrack is a clean, intuitive web application for managing your personal book collection. Track your reading progress, categorize books, rate them, and organize your literary journey - all in one place.
 
-![BookTrack App Screenshot](screenshots/preview.png)
-
 ## Features
 
 - **Book Management**: Add books with title, author, page count, and category
@@ -32,16 +30,13 @@ BookTrack is a clean, intuitive web application for managing your personal book 
 ### Installation
 1. Clone this repository:
    ```bash
-   git clone https://github.com/yourusername/booktrack.git
+   git clone https://github.com/annisacode/booktrack.git
    ```
 2. Navigate to the project directory:
    ```bash
    cd booktrack
    ```
 3. Open `index.html` in your browser or use a local server.
-
-### Online Demo
-You can check out the live demo [here](#) (Replace with your actual demo link when available).
 
 ## Usage
 
